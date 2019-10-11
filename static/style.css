@@ -19,7 +19,7 @@ a{
 }
 
 a:hover{
-    color:#092170;
+    color:#8b0be0;
 }
 
 ul{
@@ -43,4 +43,9 @@ ul{
     color: #5F667A;
     font-size: 18px;
     text-indent: 30px;
+}
+.errormessage{
+    color:rgb(217, 255, 0);
+    font-weight: bold;
+    font-size: 115%;
 }
