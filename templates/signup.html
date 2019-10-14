@@ -1,0 +1,23 @@
+{%extends "base.html"%}
+
+{% block content%}
+    <div class="signup">
+        <form action="/signup" method="POST">
+            <label>User name: <input type="text" id="username" name="username" class="label" value='{{username}}' required></label><p class="error">{{username_error}}</p>
+            <label>Password <input type="password"  id="password" name="password" class="label" required></label><p class="error">{{password_error}}</p>
+            <label>Confirm Password: <input type="password" id="confirm_password" name="confirm_password" class="label" required></label><p class="error">{{confirm_password_error}}</p>
+            <input type="submit" value="Sign Up" />
+        </form>
+    </div>
+
+    <div class="signup">
+        Form guidelines:
+            <ul>
+                <li>Must be more than 3 characters and less than 20.</li>
+                <li>Cannot contain a space.</li>
+                <li>Email address must contain a '@' and a '.' to be considered valid.</li>
+            </ul>
+
+    </div>
+
+{% endblock %}

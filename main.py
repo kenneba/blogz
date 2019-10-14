@@ -1,11 +1,11 @@
-from flask import Flask, escape, request, render_template, redirect, flash, url_for
+from flask import Flask, escape, request, render_template, redirect, flash, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import jinja2
 import os
 
 app = Flask(__name__)
 app.config['DEBUG']= True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://build-a-blog:lc101@localhost:8889/build-a-blog'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:lc101@localhost:8889/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 app.secret_key = 'ShhhhhItsasecret'
 
@@ -16,10 +16,12 @@ class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
     body = db.Column(db.String(255))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __init__(self, title, body):
+    def __init__(self, title, body, owner):
         self.title = title
         self.body = body
+        self.owner = owner
 
 @app.route('/', methods=['POST', 'GET'])
 # @app.route('/blog', methods=['POST', 'GET'])
@@ -40,7 +42,7 @@ def individ(id):
     blog_id = Blog.query.filter_by(id=id).first()
     return render_template('entry.html', posts=posts, blog_id=blog_id)
 
-@app.route('/add', methods=['POST', 'GET'])
+@app.route('/newpost', methods=['POST', 'GET'])
 def add():
     posts = Blog.query.all()
     form_value = request.args.get('id')
@@ -77,6 +79,67 @@ def add():
     else:
         return render_template('newpost.html', page_title="Add a New Entry")
 
+
+class User(db.Model):
+    
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120))
+    password = db.Column(db.String(120))
+    blogs = db.relationship('Blog', backref='owner')
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+
+@app.route('/signup', methods=['POST', 'GET'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        if len(username)<3:
+            return "<h1>Username address is too short</h1>"
+        else:
+            if (len(username)>= 3 and len(username) <= 20) and not (" " in username):
+                pass
+            else:
+              return "<h1>Please select a valid username address</h1>"
+        if len(password)>= 3 and len(password) <= 20 and not (" " in password):
+            pass
+        else:
+           return "<h1>Password does not meet requirements</h1>"
+
+        existing_user = User.query.filter_by(username=username).first()
+        if not existing_user:
+            if password and confirm_password == password:
+                new_user = User(username, password)
+                db.session.add(new_user)
+                db.session.commit()
+                session['username'] = username
+                return redirect('/')
+            else:
+                return "<h1> Sorry, passwords don't match</h1>"
+        else:
+            return "<h1> User Name has been used already</h1>" 
+
+    return render_template('signup.html', page_title = "Sign Up")
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    return render_template('login.html')
+
+@app.route('/index', methods=['POST', 'GET'])
+def home():
+    pass
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    # delete session username
+    return redirect ("/blog")
+
+    pass
 
 if __name__ == '__main__':
     app.run()
