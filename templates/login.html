@@ -5,4 +5,24 @@
 <!-- if login is successfull redirect to newpost
 incorrect passowrd redirect to login with a messgae that the password is incorrect
 incorrect username is redirected to login with a username does not exist error -->
+
+<h1>User Login Page</h1> <hr />
+
+{%with messages = get_flashed_messages() %}
+    <ul>
+    {%for message in messages%}
+    <li class="errormessage">{{message}}</li>
+    {% endfor %}
+    </ul>
+{% endwith %}
+
+<div class="signup">
+    <table>
+    <form action="/login" method="POST">
+        <tr><td><label>Username: </td><td><input type="text" id="username" name="username" value='{{username}}' class="label"></label></td></tr><br >
+        <tr><td><label>Password:</td><td><input type="password"  id="password" name="password" class="label" required></label></td></tr><br />
+        <tr><td><input type="submit" value="Log In" /></td></tr>
+    </form>
+    </table>
+</div>
 {% endblock %}

@@ -2,5 +2,20 @@
 
 {% block content%}
 
+{% if posts| length == 0 %}
+<p>There are no blog posts to show.</p>
+{%else%}
+<div class="entry">
+    <ul>
+        {%for post in posts%}
+        <li>
+            <h1>{{post.title}}</h2>
+            <p>{{post.body}}</p>
+            <p>{{owner_name}}</p>
+        </li>
+        {%endfor%}
+    </ul>
+</div>
+{%endif%}
 
 {% endblock %}

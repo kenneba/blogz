@@ -24,17 +24,23 @@ class Blog(db.Model):
         self.body = body
         self.owner = owner
 
+@app.before_request
+def require_login():
+    allowed_routes = ['login', 'signup', 'index']
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
+
 @app.route('/', methods=['POST', 'GET'])
 # @app.route('/blog', methods=['POST', 'GET'])
 def index():
     posts = Blog.query.all()
-    # full_owner = Blog.query.filter_by(owner_id=owner_id)
-    blog_user_id = Blog.owner_id
-    full_owner = User.query.filter_by(id=blog_user_id).first()
-    owner = full_owner.username
-    return render_template('blog.html', posts=posts, page_title="Home", ids=id, owner=owner)
-    
+    while len(posts) !=0:
+        owner_num = User.query.filter_by(id=Blog.owner_id).first()
+        owner_name = owner_num.username
+        return render_template('index.html', posts=posts, page_title="Home", ids=id, owner_name=owner_name)
 
+    # return render_template('blog.html', posts=posts, page_title="Home", ids=id, owner=owner)
+    
 @app.route('/blog/<string:id>', methods=['POST', 'GET'])
 def individ(id):
     posts = Blog.query.all()
@@ -46,7 +52,6 @@ def individ(id):
 def add():
     posts = Blog.query.all()
     form_value = request.args.get('id')
-    # session['username'] = username
     owner = User.query.filter_by(username=session['username']).first()
 
     if request.method == 'POST':
@@ -90,7 +95,7 @@ class User(db.Model):
 
     def __init__(self, username, password):
         self.username = username
-        self.password = password
+        self.pw_hash = make_pw_hash(password)
 
 
 @app.route('/signup', methods=['POST', 'GET'])
@@ -146,10 +151,14 @@ def login():
 def home():
     pass
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout', methods=['POST', 'GET'])
 def logout():
-    del session['username']
-    return redirect ("/")
+    if session['username']!="":
+        del session['username']
+        return redirect ("/")
+    else:
+        return redirect('/login')
+    # return redirect ("/blog")
 
     pass
 
