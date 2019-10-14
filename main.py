@@ -2,6 +2,7 @@ from flask import Flask, escape, request, render_template, redirect, flash, url_
 from flask_sqlalchemy import SQLAlchemy
 import jinja2
 import os
+from hashutils import make_pw_hash, check_pw_hash
 
 app = Flask(__name__)
 app.config['DEBUG']= True
@@ -26,13 +27,12 @@ class Blog(db.Model):
 @app.route('/', methods=['POST', 'GET'])
 # @app.route('/blog', methods=['POST', 'GET'])
 def index():
-    # blog_id = Blog.query.filter_by(id=id).first()
     posts = Blog.query.all()
-    
-    if id == 6:
-        pass
-    else:
-        return render_template('blog.html', posts=posts, page_title="Home", ids=id)
+    # full_owner = Blog.query.filter_by(owner_id=owner_id)
+    blog_user_id = Blog.owner_id
+    full_owner = User.query.filter_by(id=blog_user_id).first()
+    owner = full_owner.username
+    return render_template('blog.html', posts=posts, page_title="Home", ids=id, owner=owner)
     
 
 @app.route('/blog/<string:id>', methods=['POST', 'GET'])
@@ -46,12 +46,13 @@ def individ(id):
 def add():
     posts = Blog.query.all()
     form_value = request.args.get('id')
-
+    # session['username'] = username
+    owner = User.query.filter_by(username=session['username']).first()
 
     if request.method == 'POST':
         new_title = request.form['title']
         new_body = request.form['body']
-        new_post = Blog(new_title, new_body)
+        new_post = Blog(new_title, new_body, owner)
 
         if new_title == "":
             new_body = request.form['body']
@@ -84,7 +85,7 @@ class User(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120))
-    password = db.Column(db.String(120))
+    pw_hash = db.Column(db.String(120))
     blogs = db.relationship('Blog', backref='owner')
 
     def __init__(self, username, password):
@@ -128,6 +129,17 @@ def signup():
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = User.query.filter_by(username=username).first()
+        if user and check_pw_hash(password, user.pw_hash):
+            session['username'] = username
+            flash("Logged in", 'error')
+            return redirect('/')
+        else:
+            flash("Username or password is incorrect")
+
     return render_template('login.html')
 
 @app.route('/index', methods=['POST', 'GET'])
@@ -136,8 +148,8 @@ def home():
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    # delete session username
-    return redirect ("/blog")
+    del session['username']
+    return redirect ("/")
 
     pass
 
