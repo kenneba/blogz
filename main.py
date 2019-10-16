@@ -26,18 +26,22 @@ class Blog(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'signup']
+    allowed_routes = ['login', 'signup','blog','index']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
 @app.route('/', methods=['POST', 'GET'])
-# @app.route('/blog', methods=['POST', 'GET'])
 def index():
     posts = Blog.query.all()
-    return render_template('index.html', posts=posts, page_title="Home", ids=id)
+    users = User.query.distinct(User.username).all()
+    return render_template('index.html', posts=posts, page_title="Home", ids=id, users=users)
 
-    # return render_template('blog.html', posts=posts, page_title="Home", ids=id, owner=owner)
-    
+@app.route('/blog', methods=['POST', 'GET'])
+def blog():
+    posts = Blog.query.all()
+    # idnumber = request.args.get()
+    return render_template('blog.html', posts=posts)
+
 @app.route('/blog/<string:id>', methods=['POST', 'GET'])
 def individ(id):
     posts = Blog.query.all()
@@ -154,7 +158,7 @@ def login():
         if user and check_pw_hash(password, user.pw_hash):
             session['username'] = username
             flash("Logged in", 'error')
-            return redirect('/')
+            return redirect('/newpost')
         elif not user:
             flash("Username does not exist", 'error')
             return redirect('/signup')
@@ -173,9 +177,9 @@ def home():
 def logout():
     if session['username']!="":
         del session['username']
-        return redirect ("/")
+        return redirect ("/blog")
     else:
-        return redirect('/login')
+        return redirect('/blog')
     # return redirect ("/blog")
 
     pass

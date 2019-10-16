@@ -9,18 +9,21 @@
 <p>There are no blog posts to show.</p>
 {%else%}
 <div class="entry">
-    <ul>
-        {%for post in posts %}
-            <!-- post.owner.id: {{post.owner.id}} -->
-            {%if post.owner.id == user_id.id %}
-                <li>
-                    <h1>{{post.title}}</h2>
-                    <p>{{post.body}}</p>
-                    <!-- <p>Created by: <a href="/singleuser/{{post.owner.username}}">{{post.owner.username}}</a></p> -->
-                </li>
-            {%endif%}
-        {%endfor%}
-    </ul>
+    {% if posts| length == 0 %}
+    <p>There are no blog posts to show.</p>
+    {%else%}
+        <ul>
+            {%for post in posts %}
+                {%if post.owner.id == user_id.id %}
+                    <li>
+                        <h1>{{post.title}}</h2>
+                        <p>{{post.body}}</p>
+                        <p>Created by: <a href="/singleuser/{{post.owner.username}}">{{post.owner.username}}</a></p>
+                    </li>
+                {%endif%}
+            {%endfor%}
+        </ul>
+    {%endif%}
 </div>
 {%endif%}
 

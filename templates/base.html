@@ -5,13 +5,17 @@
     <link type="text/css" href="/static/style.css" rel="stylesheet">
 </head>
 <body>
-    {% if session['username'] == "" %}
-    <h3>Please log in.</h3>>
+    {% if not session['username'] %}
+    <h3>Please log in.</h3>
     {%else%}
     <h3>Hi, {{session['username']}}</h3>
     {%endif%}
+    <form action="/logout" method="POST">
+        <input type="submit" value="Log Out" />
+    </form>
     <ul style="list-style-type:none" class="navbar">
         <li><a href="/"  class="navlinks">Home</a></li>
+        <li><a href="/blog"  class="navlinks">All Entries</a></li>
         <li><a href="/signup" class="navlinks">Create An Account</a></li>
         <li><a href="/newpost" class="navlinks">Add A New Entry</a></li>
         <li><a href="/logout" class="navlinks">Logout</a></li>

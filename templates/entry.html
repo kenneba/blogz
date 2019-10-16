@@ -2,8 +2,12 @@
 
 {% block content%}
 <div class="entry">
-    <h2>{{blog_id.title}}</h2>
-    <p class="postbody">{{blog_id.body}}</p>
-    <p class="postbody">Created by: {{blog_id.owner_id}}</p>
+    {% if posts| length == 0 %}
+        <p>There are no blog posts to show.</p>
+    {%else%}
+        <h2>{{blog_id.title}}</h2>
+        <p class="postbody">{{blog_id.body}}</p>
+        <p class="postbody">Created by: <a href="/singleuser/{{blog_id.owner.username}}">{{blog_id.owner.username}}</a></p>
+    {%endif%}
 </div>
 {% endblock %}
