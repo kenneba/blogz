@@ -1,0 +1,27 @@
+{%extends "base.html"%}
+
+{% block content%}
+<!-- Will be used to display only one person's blogs -->
+<!-- It will be used when we dynamically generate a page using a GET request with a user query parameter on the 
+    /blog route (similar to how we dynamically generated individual blog entry pages in the last assignment). -->
+
+{% if posts| length == 0 %}
+<p>There are no blog posts to show.</p>
+{%else%}
+<div class="entry">
+    <ul>
+        {%for post in posts %}
+            <!-- post.owner.id: {{post.owner.id}} -->
+            {%if post.owner.id == user_id.id %}
+                <li>
+                    <h1>{{post.title}}</h2>
+                    <p>{{post.body}}</p>
+                    <!-- <p>Created by: <a href="/singleuser/{{post.owner.username}}">{{post.owner.username}}</a></p> -->
+                </li>
+            {%endif%}
+        {%endfor%}
+    </ul>
+</div>
+{%endif%}
+
+{% endblock %}

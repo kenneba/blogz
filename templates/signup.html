@@ -2,12 +2,14 @@
 
 {% block content%}
     <div class="signup">
+        <table>
         <form action="/signup" method="POST">
-            <label>User name: <input type="text" id="username" name="username" class="label" value='{{username}}' required></label><p class="error">{{username_error}}</p>
-            <label>Password <input type="password"  id="password" name="password" class="label" required></label><p class="error">{{password_error}}</p>
-            <label>Confirm Password: <input type="password" id="confirm_password" name="confirm_password" class="label" required></label><p class="error">{{confirm_password_error}}</p>
-            <input type="submit" value="Sign Up" />
+            <tr><td><label>User name: </td><td><input type="text" id="username" name="username" class="label" value='{{username}}'></label></td></tr>
+            <tr><td><label>Password: </td><td><input type="password"  id="password" name="password" class="label"></label><p class="error"></td></tr>
+            <tr><td><label>Confirm Password: </td><td><input type="password" id="confirm_password" name="confirm_password" class="label"></label><p class="error"></td></tr>
+            <tr><td><input type="submit" value="Sign Up" /></td></tr>
         </form>
+        </table>
     </div>
 
     <div class="signup">

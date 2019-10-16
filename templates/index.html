@@ -9,9 +9,9 @@
     <ul>
         {%for post in posts%}
         <li>
-            <h1>{{post.title}}</h2>
-            <p>{{post.body}}</p>
-            <p>{{owner_name}}</p>
+            <!-- <h1>{{post.title}}</h2>
+            <p>{{post.body}}</p> -->
+            <h2><a href="/singleuser/{{post.owner.username}}">{{post.owner.username}}</a></h2>
         </li>
         {%endfor%}
     </ul>

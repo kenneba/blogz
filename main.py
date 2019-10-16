@@ -26,7 +26,7 @@ class Blog(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['login', 'signup', 'index']
+    allowed_routes = ['login', 'signup']
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -34,10 +34,7 @@ def require_login():
 # @app.route('/blog', methods=['POST', 'GET'])
 def index():
     posts = Blog.query.all()
-    while len(posts) !=0:
-        owner_num = User.query.filter_by(id=Blog.owner_id).first()
-        owner_name = owner_num.username
-        return render_template('index.html', posts=posts, page_title="Home", ids=id, owner_name=owner_name)
+    return render_template('index.html', posts=posts, page_title="Home", ids=id)
 
     # return render_template('blog.html', posts=posts, page_title="Home", ids=id, owner=owner)
     
@@ -85,6 +82,17 @@ def add():
     else:
         return render_template('newpost.html', page_title="Add a New Entry")
 
+@app.route('/singleuser')
+def singleuser():
+    return render_template("singleuser.html")
+
+@app.route('/singleuser/<string:username>', methods=['POST', 'GET'])
+def username(username):
+    posts = Blog.query.all()
+    users = User.query.all()
+    user_id = User.query.filter_by(username=username).first()
+    return render_template("singleuser.html", posts=posts, users=users, user_id=user_id)
+
 
 class User(db.Model):
     
@@ -106,16 +114,19 @@ def signup():
         confirm_password = request.form['confirm_password']
 
         if len(username)<3:
-            return "<h1>Username address is too short</h1>"
+            flash("Username address is too short", 'error')
+            return redirect('/signup')
         else:
             if (len(username)>= 3 and len(username) <= 20) and not (" " in username):
                 pass
             else:
-              return "<h1>Please select a valid username address</h1>"
+                flash("Please select a valid username", 'error')
+                return redirect('/signup')
         if len(password)>= 3 and len(password) <= 20 and not (" " in password):
             pass
         else:
-           return "<h1>Password does not meet requirements</h1>"
+            flash("Password does not meet requirements", 'error')
+            return redirect('/signup')
 
         existing_user = User.query.filter_by(username=username).first()
         if not existing_user:
@@ -126,9 +137,11 @@ def signup():
                 session['username'] = username
                 return redirect('/')
             else:
-                return "<h1> Sorry, passwords don't match</h1>"
+                flash("Sorry, passwords don't match", 'error')
+                return redirect('/signup')
         else:
-            return "<h1> User Name has been used already</h1>" 
+            flash("User Name has been used already", 'error')
+            return redirect('/signup')
 
     return render_template('signup.html', page_title = "Sign Up")
 
@@ -142,8 +155,13 @@ def login():
             session['username'] = username
             flash("Logged in", 'error')
             return redirect('/')
-        else:
-            flash("Username or password is incorrect")
+        elif not user:
+            flash("Username does not exist", 'error')
+            return redirect('/signup')
+        elif not check_pw_hash(password, user.pw_hash):
+            flash("Password is incorrect")
+            return redirect('/login')
+        
 
     return render_template('login.html')
 
