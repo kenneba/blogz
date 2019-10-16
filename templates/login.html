@@ -2,19 +2,7 @@
 
 {% block content%}
 
-<!-- if login is successfull redirect to newpost
-incorrect passowrd redirect to login with a messgae that the password is incorrect
-incorrect username is redirected to login with a username does not exist error -->
-
 <h1>User Login Page</h1> <hr />
-
-{%with messages = get_flashed_messages() %}
-    <ul>
-    {%for message in messages%}
-    <li class="errormessage">{{message}}</li>
-    {% endfor %}
-    </ul>
-{% endwith %}
 
 <div class="signup">
     <table>
